@@ -1,0 +1,19 @@
+<script>
+var comp;
+    function parse() {
+        var data = document.getElementById("datIN").value;
+        var usn = document.getElementById("name").value;
+        var parse1 = data.split("**");
+        comp = new Object();
+        parse1.forEach(function(dat) {
+            dat = dat.split("__");
+            comp[dat[1]] = {"t": [dat[0]], "w": usn};
+        });
+        console.log(comp);
+    }
+</script>
+
+Parsed input:
+USername: <input type='text' id='name'/><br><br>
+Input: <input type='text' id='datIN'/>
+<button onclick="parse()">Parse</button>

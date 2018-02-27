@@ -1,0 +1,75 @@
+<head>
+    <title>Community Translate</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            padding: 5%;
+        }
+        td {
+            vertical-align: top;
+            padding: 5px;
+            padding-left: 10px;
+        }
+
+    </style>
+    
+    
+    
+    <script>
+    var localdb = new Object();
+function stateWord() {
+var res = document.getElementById("en").value.split(" ");
+if (res.length > 1) {
+    res.forEach(function(item) {
+       if (typeof localdb[item] == "undefined") {
+           if (item == "") {} else {
+           httpGetAsync("/api/word/en-es/" + item, function(cb) {
+              localdb[item] = JSON.parse(cb);
+              processStream();
+           });
+       }
+       }
+    });
+}
+}
+
+function getTranslations(item) {
+    if (localdb[item] == null) {
+        return ["<font color='red'>unknown</font>"]
+    } else {
+        return localdb[item]["t"]
+    }
+}
+function processStream() {
+    var en = "<td><b>English:</td>";
+    var es = "<td><b>Spanish:</td>";
+    var res = document.getElementById("en").value.split(" ");
+    res.forEach(function(item) {
+        en += "<td>" + item + "</td>";
+        es += "<td>" + getTranslations(item) + "</td>";
+    });
+    document.getElementById("es").innerHTML = "<table>" + "<tr>" + en + "</tr>" + "<tr>" + es + "</tr></table>";
+}
+    function httpGetAsync(theUrl, callback)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callback(xmlHttp.responseText);
+    }
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+    xmlHttp.send(null);
+}
+</script>
+
+
+
+</head>
+<body>
+    <h1>Community Translate Beta</h1>
+    <a href='/new'>Add New Words</a><br><br>
+   <i>This system is in public beta, it may be buggy or not work at all. Translations are per-word and the system does not do grammer for you.</i>
+    <br><br>English in: <input id='en' onkeyup="stateWord()" style='width: 80%'>
+    <br>
+    <div id='es'></div>
+</body>

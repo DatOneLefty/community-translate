@@ -1,0 +1,57 @@
+<script>
+var end, en, es, username;
+    function httpGetAsync(theUrl, callback)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callback(xmlHttp.responseText);
+    }
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+    xmlHttp.send(null);
+}
+    function sub() {
+        end = new Object();
+        username = document.getElementById("username").value;
+        en = document.getElementById("eng").value;
+        es = document.getElementById("esp").value;
+        es = es.split(";");
+        
+        end[en] = {"t": es, "w": username}
+        httpGetAsync("/api/check/" + en, function(res) {
+           if (res == "true") {
+               alert("This word is already in the database! You can still submit if you believe it is incorrect though.");
+           } 
+            document.getElementById("final").innerHTML = en + " has " + es.length + " terms being: <br>" + es; 
+        });
+    }
+    function confirm() {
+                        document.getElementById("final").innerHTML = "<font color='blue'>Submitting...</font>";
+
+        httpGetAsync("/api/add/" + "en-es" + "/" + en + "/" + es + "/" + username + "/", function(ret) {
+            if (ret == "true") {
+                document.getElementById("final").innerHTML = "<font color='green'>Submitted</font>";
+            }
+        });
+    }
+</script>
+
+<center>
+    <h2>Add New Word</h2>
+<div style='padding: 5%'>
+<table>
+    <tr><td>Translation</td><td>english-spanish</tr>
+        <tr><td>Username</td><td><input id='username'></td></tr>
+    <tr><td>English Word</td><td><input id='eng'></td></tr>
+    <tr><td>Translations (seperated by a ;)<br> ex: "hello,goodbye" NOT "hello, goodbye"</td><td><input id='esp'></td></tr>
+</table>
+    <button onclick="sub()">Submit for Review</button>
+
+</div>
+This system is still in alpha, so it may look messy and not work properly
+<div style='width: 50%'>
+<h3>Confirm</h3>
+<font color='red'><h4>Words will not be added until you confirm again below!</h4></font>
+<div style='border: 1px solid black;' id='final'></div>
+<button onclick='confirm()'>Confirm</button>
+</center>

@@ -1,0 +1,47 @@
+<style>
+    td {
+      padding: 5px;  
+      border: 1px solid blue;
+    }
+</style>
+<script>
+        function httpGetAsync(theUrl, callback)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callback(xmlHttp.responseText);
+    }
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+    xmlHttp.send(null);
+}
+
+httpGetAsync("/toCheck/" + window.location.pathname.split("/")[2], function(response) {
+    var e = "<table><tr><td>En</td><td>Es</td><td>By</td><td>approve</td></tr>";
+    var r2 = JSON.parse(response);
+    Object.keys(r2["en-es"]).forEach(function(key) {
+
+    var c = r2["en-es"][key];
+    e += "<tr id='" + key + "'><td>" + c["e"] + "</td><td>" + c["t"] + "</td><td>" + c["w"] + "</td><td><button onclick='add(" + '"' + key + '"' + ")'>Approve</button><button onclick='reject(" + '"' + key + '"' + ")'>Reject</button></td></tr>";
+});
+    document.getElementById("c").innerHTML = e;
+
+    e += "</table>";
+
+
+
+});
+function add(item) {
+    httpGetAsync("/aN/true/" + item + "/" +  window.location.pathname.split("/")[2] + "/en-es", function(resp) {
+       document.getElementById((item)).innerHTML = resp; 
+    });
+}
+function reject(item) {
+    httpGetAsync("/aN/false/" + item + "/" +  window.location.pathname.split("/")[2] + "/en-es", function(resp) {
+       document.getElementById((item)).innerHTML = resp; 
+    });
+}
+</script>
+<center>
+    <div id='c'></div>
+</center>
